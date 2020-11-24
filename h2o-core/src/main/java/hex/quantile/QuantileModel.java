@@ -13,6 +13,7 @@ public class QuantileModel extends Model<QuantileModel,QuantileModel.QuantilePar
     // Set of probabilities to compute
     public double _probs[/*Q*/] = new double[]{0.001,0.01,0.1,0.25,0.333,0.50,0.667,0.75,0.9,0.99,0.999};
     public CombineMethod _combine_method = CombineMethod.INTERPOLATE;
+    public boolean _writeRowNumber = false; // if true will output row number of quantile values
     protected boolean defaultDropConsCols() { return false; }
     public String algoName() { return "Quantiles"; }
     public String fullName() { return "Quantiles"; }
@@ -24,6 +25,8 @@ public class QuantileModel extends Model<QuantileModel,QuantileModel.QuantilePar
     public QuantileParameters _parameters;   // Model parameters
     public int _iterations;        // Iterations executed
     public double _quantiles[/*N*/][/*Q*/]; // Our N columns, Q quantiles reported
+    public long[][] _rowNumber; // Our N columns, Q quantiles row number
+    
     public QuantileOutput( Quantile b ) { super(b); }
     @Override public ModelCategory getModelCategory() { return ModelCategory.Unknown; }
   }

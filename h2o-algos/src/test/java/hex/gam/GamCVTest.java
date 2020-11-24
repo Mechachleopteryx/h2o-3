@@ -15,6 +15,7 @@ import water.util.RandomUtils;
 import java.util.Random;
 
 import static org.junit.Assert.*;
+import static hex.gam.GAMModel.GAMParameters;
 
 @RunWith(H2ORunner.class)
 @CloudSize(1)
@@ -51,7 +52,7 @@ public class GamCVTest extends TestUtil {
       params._family = GLMModel.GLMParameters.Family.binomial;
       params._response_column = "C21";
       params._max_iterations = 3;
-      params._gam_columns = new String[]{"C11"};
+      params._gam_columns = new String[][]{{"C11"}};
       params._train = train._key;
       params._solver = GLMModel.GLMParameters.Solver.IRLSM;
       params._fold_assignment = Model.Parameters.FoldAssignmentScheme.Random;
@@ -102,7 +103,7 @@ public class GamCVTest extends TestUtil {
       params._family = GLMModel.GLMParameters.Family.multinomial;
       params._response_column = "species";
       params._max_iterations = 3;
-      params._gam_columns = new String[]{"petal_wid"};
+      params._gam_columns = new String[][]{{"petal_wid"}};
       params._train = train._key;
       params._solver = GLMModel.GLMParameters.Solver.IRLSM;
       params._fold_assignment = Model.Parameters.FoldAssignmentScheme.Random;
@@ -153,7 +154,7 @@ public class GamCVTest extends TestUtil {
       params._family = GLMModel.GLMParameters.Family.gaussian;
       params._response_column = "sepal_len";
       params._max_iterations = 3;
-      params._gam_columns = new String[]{"petal_wid"};
+      params._gam_columns = new String[][]{{"petal_wid"}};
       params._train = train._key;
       params._solver = GLMModel.GLMParameters.Solver.IRLSM;
       params._fold_assignment = Model.Parameters.FoldAssignmentScheme.Random;
@@ -185,6 +186,36 @@ public class GamCVTest extends TestUtil {
         int foldNum = (int) fold_assignment_frame.vec(0).at(row);
         assert predFrames[foldNum].vec(0).at(row) == cvModelPreds[foldNum].vec(0).at(row) : "Frame contents differ.";
       }
+    } finally {
+      Scope.exit();
+    }
+  }
+
+  // test CV with validation data for GAM with CS and TP
+  @Test
+  public void testCVTP() {
+    Scope.enter();
+    try {
+      Frame train = parse_test_file("smalldata/glm_test/binomial_20_cols_10KRows.csv");
+      train.replace((20), train.vec(20).toCategoricalVec()).remove();
+      DKV.put(train);
+      Scope.track(train);
+      String[] ignoredCols = new String[]{"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"};
+      //   String[][] gamCols = new String[][]{{"C11"},{"C12", "C13"}, {"C11"}, {"C14", "C15", "C16"}};
+      String[][] gamCols = new String[][]{{"C11"}};
+      GAMParameters params = new GAMParameters();
+      params._bs = new int[]{1};
+      params._response_column = "C21";
+      params._ignored_columns = ignoredCols;
+      params._gam_columns = gamCols;
+      params._train = train._key;
+      params._nfolds = 3;
+      params._savePenaltyMat = true;
+      params._standardize_TP_gam_cols = true;
+      GAMModel gam = new GAM(params).trainModel().get();  // GAM model without standarization of TP gam columns
+      Scope.track_generic(gam);
+      // check to make sure validation metrics, cross validation metrics are not null
+      assertTrue(gam._output._cross_validation_metrics != null); // check and make sure validation metrics is not null
     } finally {
       Scope.exit();
     }

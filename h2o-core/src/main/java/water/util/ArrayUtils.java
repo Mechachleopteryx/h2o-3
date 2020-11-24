@@ -410,7 +410,6 @@ public class ArrayUtils {
     for (int i=0; i<nums.length; i++) nums[i] *= nums2[i];
     return nums;
   }
-
   public static double[] invert(double[] ary) {
     if(ary == null) return null;
     for(int i=0;i<ary.length;i++) ary[i] = 1. / ary[i];
@@ -514,6 +513,17 @@ public class ArrayUtils {
     for(int i = 0; i < res.length; i++) {
       for(int j = 0; j < res[0].length; j++)
         res[i][j] = ary[j][i];
+    }
+    return res;
+  }
+
+  public static double[][] expandArray(double[][] ary, int newColNum) {
+    if(ary == null) return null;
+    assert ary.length < newColNum : "new array should be greater than original array in second dimension.";
+    int oldMatRow = ary.length;
+    double[][] res = new double[newColNum][newColNum];
+    for(int i = 0; i < oldMatRow; i++) {
+      System.arraycopy(ary[i], 0, res[i], 0, oldMatRow);
     }
     return res;
   }
@@ -832,6 +842,16 @@ public class ArrayUtils {
       if (from[i]<from[result]) result = i;
     return result;
   }
+  
+  public static int totalArrayDimension(String[][] arr) {
+    int dim = 0;
+    for (int outInd = 0; outInd < arr.length; outInd++) {
+      for (int innerInd = 0; innerInd < arr[outInd].length; innerInd++)
+        dim++;
+    }
+    return dim;
+  }
+  
   public static double maxValue(double[] ary) {
     return maxValue(ary,0,ary.length);
   }
@@ -870,6 +890,12 @@ public class ArrayUtils {
   }
   public static long maxValue(long[] from) {
     long result = from[0];
+    for (int i = 1; i<from.length; ++i)
+      if (from[i]>result) result = from[i];
+    return result;
+  }
+  public static int maxValue(Integer[] from) {
+    int result = from[0];
     for (int i = 1; i<from.length; ++i)
       if (from[i]>result) result = from[i];
     return result;
@@ -1078,6 +1104,38 @@ public class ArrayUtils {
       vseed[i] = random.nextGaussian();
     }
     return vseed;
+  }
+
+  /** Remove the array allocation in this one */
+  public static double[] uniformVector(long seed, double[] vseed) {
+    if (vseed == null)
+      return null;
+
+    Random random = getRNG(seed);
+    int arraySize = vseed.length;
+    for (int i=0; i < arraySize; i++) {
+      vseed[i] = random.nextDouble();
+    }
+    return vseed;
+  }
+
+  /** Remove the array allocation in this one */
+  public static long[] longRandomVector(long seed, int vectorSize, long maxVal) {
+    Random random = getRNG(seed);
+    Set<Long> randomLong = new HashSet<>();
+    while (randomLong.size() < vectorSize) {
+      long randVal = random.nextLong() % maxVal;
+      if (randVal < 0)
+        randVal = randVal+maxVal;
+      randomLong.add(randVal);
+    }
+    long[] randomLongArr = new long[vectorSize];
+    Iterator<Long> setIter = randomLong.iterator();
+    int count = 0;
+    while (setIter.hasNext())
+      randomLongArr[count++] = setIter.next();
+    
+    return randomLongArr;
   }
 
   /** Returns number of strings which represents a number. */
@@ -1537,6 +1595,21 @@ public class ArrayUtils {
   public static double [] subtract (double [] a, double [] b) {
     double [] c = MemoryManager.malloc8d(a.length);
     subtract(a,b,c);
+    return c;
+  }
+  
+  public static double [][] subtract (double [][] a, double [][] b) {
+    double [][] c = MemoryManager.malloc8d(a.length, a[0].length);
+    for (int rowIndex = 0; rowIndex < c.length; rowIndex++) {
+      c[rowIndex] = subtract(a[rowIndex], b[rowIndex], c[rowIndex]);
+    }
+    return c;
+  }
+
+  public static int [] subtract (int [] a, int [] b) {
+    int [] c = MemoryManager.malloc4 (a.length);
+    for (int i = 0; i < a.length; i++)
+      c[i] = a[i]-b[i];
     return c;
   }
 
