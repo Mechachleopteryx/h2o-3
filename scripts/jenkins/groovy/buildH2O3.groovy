@@ -21,7 +21,7 @@ def call(final pipelineContext) {
                 insideDocker(buildEnv, pipelineContext.getBuildConfig().getDefaultImage(), pipelineContext.getBuildConfig().DOCKER_REGISTRY, pipelineContext.getBuildConfig(), timeoutMinutes, 'MINUTES') {
                     try {
                         makeTarget(pipelineContext) {
-                            target = 'build-h2o-3'
+                            target = 'test-build-h2o-public'
                             hasJUnit = false
                             archiveFiles = false
                             makefilePath = pipelineContext.getBuildConfig().MAKEFILE_PATH
