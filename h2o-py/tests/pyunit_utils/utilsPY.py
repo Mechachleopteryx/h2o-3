@@ -3490,16 +3490,16 @@ def compare_frames_local(f1, f2, prob=0.5, tol=1e-6, returnResult=False):
         if (typeDict[frameNames[colInd]]==u'enum'):
             if returnResult:
                 result = compare_frames_local_onecolumn_NA_enum(f1[colInd], f2[colInd], prob=prob, tol=tol, returnResult=returnResult)
-                if not(result):
+                if not(result) and returnResult:
                     return False
             else:
                 result = compare_frames_local_onecolumn_NA_enum(f1[colInd], f2[colInd], prob=prob, tol=tol, returnResult=returnResult)
-                if not(result):
+                if not(result) and returnResult:
                     return False
         elif (typeDict[frameNames[colInd]]==u'string'):
             if returnResult:
                 result =  compare_frames_local_onecolumn_NA_string(f1[colInd], f2[colInd], prob=prob, returnResult=returnResult)
-                if not(result):
+                if not(result) and returnResult:
                     return False
             else:
                 compare_frames_local_onecolumn_NA_string(f1[colInd], f2[colInd], prob=prob, returnResult=returnResult)
@@ -3508,7 +3508,7 @@ def compare_frames_local(f1, f2, prob=0.5, tol=1e-6, returnResult=False):
         else:
             if returnResult:
                 result = compare_frames_local_onecolumn_NA(f1[colInd], f2[colInd], prob=prob, tol=tol, returnResult=returnResult)
-                if not(result):
+                if not(result) and returnResult:
                     return False
             else:
                 compare_frames_local_onecolumn_NA(f1[colInd], f2[colInd], prob=prob, tol=tol, returnResult=returnResult)

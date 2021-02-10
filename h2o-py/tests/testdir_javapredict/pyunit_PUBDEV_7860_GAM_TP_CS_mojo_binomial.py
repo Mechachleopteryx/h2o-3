@@ -9,9 +9,9 @@ def gam_binomial_mojo():
     params = set_params()
     train = h2o.import_file(pyunit_utils.locate("smalldata/glm_test/binomial_20_cols_10KRows.csv"))
     test =  h2o.import_file(pyunit_utils.locate("smalldata/glm_test/binomial_20_cols_10KRows.csv"))
-    test = test[0:10,0:21]
     train["C21"] = train["C21"].asfactor()
     test["C21"] = test["C21"].asfactor()
+    test = test[0:10, 0:21]
     x=["C1"]
     y = "C21"
 
